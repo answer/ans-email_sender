@@ -2,6 +2,6 @@ require "ans-email_sender/version"
 
 module Ans
   module EmailSender
-    # Your code goes here...
+    autoload :Job, "ans-email_sender/job"
   end
 end
