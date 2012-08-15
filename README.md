@@ -96,7 +96,7 @@ SystemSetting に以下の設定を行うことで、メールキューの取得
       def validate!(email_queue)
         # 例外を投げて送信をキャンセルする
         # メッセージは email_queue の send_error に保存される
-        raise "メールアドレスが不正です" if EmailAddress.ban(email_queue.to).count > 0
+        #raise "メールアドレスが不正です" if EmailAddress.ban(email_queue.to).count > 0
       end
       def after_deliver(email_queue)
         # 送信後の処理を行う
