@@ -86,6 +86,34 @@ type には minute, hour, day, week が渡される
 
 デフォルトは、 SystemSetting から `email_send_limit_of_minute` 等の値を読むクラスが使用される
 
+### job
+
+* `validate!(email_queue)` : キューの中身を検証する
+* `after_deliver(email_queue)` : 送信処理の後処理を行う
+* `mail(email_queue)` : メールを送信する mail クラスを返す
+
+#### `validate!(email_queue)`
+
+処理予定の `email_queue` の検証を行う
+
+送信をキャンセルする場合、例外を raise する
+
+デフォルトは何もしない
+
+#### `after_deliver(email_queue)`
+
+処理を行った `email_queue` の後処理を行う
+
+デフォルトは何もしない
+
+#### `mail(email_queue)`
+
+メールを送信するメールオブジェクトを返す
+
+デフォルトは `Ans::EmailSender::Mailer.queue(email_queue)`
+
+`Ans::EmailSender::Mailer` は `ApplicationMailer` が定義されていればそれを、されていなければ `ActionMailer::Base` を継承する
+
 ## Contributing
 
 1. Fork it
