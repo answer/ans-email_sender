@@ -18,7 +18,22 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: ここにつかいかたをかく
+    # model
+    class EmailQueue < ActiveRecord::Base
+      include Ans::EmailSender::Model
+    end
+
+    # job
+    class EmailSender
+      include Ans::EmailSender::Job
+
+      @queue = :mail
+    end
+
+    # resque scheduler file
+    EmailSender:
+      description: "メールキューを処理する"
+      cron: "*/1 * * * *"
 
 ## Contributing
 
