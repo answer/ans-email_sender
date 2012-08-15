@@ -26,7 +26,6 @@ Or install it yourself as:
     # job
     class EmailSender
       include Ans::EmailSender::Job
-
       @queue = :mail
     end
 
@@ -74,45 +73,40 @@ SystemSetting に以下の設定を行うことで、メールキューの取得
 
 ## オーバーライド可能なメソッド
 
-### model
+    # model
+    class EmailQueue
+      include Ans::EmailSender::Model
 
-* `send_config` : 設定オブジェクトを返す
+      private
 
-#### `send_config`
+      def send_config
+        # limit_of(type) メソッドが定義されたオブジェクトを返す
+        # type には minute, hour, day, week が渡される
+        @send_config ||= Ans::EmailSender::Config.new
+      end
+    end
 
-`limit_of(type)` メソッドが定義されたオブジェクトを返す
+    # job
+    class EmailSender
+      include Ans::EmailSender::Job
+      @queue = :mail
 
-type には minute, hour, day, week が渡される
+      private
 
-デフォルトは、 SystemSetting から `email_send_limit_of_minute` 等の値を読むクラスが使用される
+      def validate!(email_queue)
+        # 例外を投げて送信をキャンセルする
+        # メッセージは email_queue の send_error に保存される
+        raise "メールアドレスが不正です" if EmailAddress.ban(email_queue.to).count > 0
+      end
+      def after_deliver(email_queue)
+        # 送信後の処理を行う
+      end
 
-### job
-
-* `validate!(email_queue)` : キューの中身を検証する
-* `after_deliver(email_queue)` : 送信処理の後処理を行う
-* `mail(email_queue)` : メールを送信する mail クラスを返す
-
-#### `validate!(email_queue)`
-
-処理予定の `email_queue` の検証を行う
-
-送信をキャンセルする場合、例外を raise する
-
-デフォルトは何もしない
-
-#### `after_deliver(email_queue)`
-
-処理を行った `email_queue` の後処理を行う
-
-デフォルトは何もしない
-
-#### `mail(email_queue)`
-
-メールを送信するメールオブジェクトを返す
-
-デフォルトは `Ans::EmailSender::Mailer.queue(email_queue)`
-
-`Ans::EmailSender::Mailer` は `ApplicationMailer` が定義されていればそれを、されていなければ `ActionMailer::Base` を継承する
+      def mail(email_queue)
+        # メールを送信するメールオブジェクトを返す
+        Ans::EmailAddress::Mailer.queue(email_queue)
+      end
+    end
 
 ## Contributing
 
