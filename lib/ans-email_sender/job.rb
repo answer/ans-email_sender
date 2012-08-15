@@ -1,61 +1,41 @@
 # -*- coding: utf-8 -*-
 
 module Ans::EmailSender
-  class Job
-    class CheckFault < StandardError; end
+  module Job
+    def self.included(m)
+      m.extend ClassMethods
+    end
 
-    @queue = :mail
-
-    def self.perform
-      EmailQueue.publish do |queue|
-        new(queue).deliver
+    module ClassMethods
+      def perform
+        EmailQueue.publish do |email_queue|
+          new.deliver(email_queue)
+        end
       end
     end
 
-    def initialize(queue)
-      @queue = queue
-    end
+    def deliver(email_queue)
+      validate! email_queue
+      mail(email_queue).deliver
 
-    def deliver
-      check_email_address
-      exec_deliver
-
-    rescue CheckFault => e
-      @error = e.message
-
-    rescue => all_deliver_errors
-      @error = "メール送信エラー"
-
+    rescue => e
+      email_queue.send_error = "ERROR: #{e.message}"
+    else
+      email_queue.sent_at = Time.now
     ensure
-      save_send_status
+      email_queue.save
+      after_deliver email_queue
     end
 
     private
 
-    def check_email_address
-      # メールアドレスが登録されていなければ何もしない
-      return unless email_address = @queue.user_email_address
-
-      raise CheckFault, "メールアドレスがブラックに設定されています" if email_address.is_black
-      raise CheckFault, "メールアドレスがエラーに設定されています" if email_address.is_error
+    def validate!(email_queue)
+    end
+    def after_deliver(email_queue)
     end
 
-    def exec_deliver
-      Member::Mailer.queue(@queue).deliver
-    end
-
-    def save_send_status
-      unless @error
-        send_ok
-      else
-        send_error @error
-      end
-    end
-    def send_ok
-      @queue.update_attributes send_datetime: Time.now
-    end
-    def send_error(message)
-      @queue.update_attributes send_memo: message
+    def mail(email_queue)
+      Ans::EmailSender::Mailer.queue(email_queue)
     end
 
   end

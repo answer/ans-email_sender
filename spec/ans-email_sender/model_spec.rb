@@ -3,7 +3,6 @@
 require 'spec_helper'
 require "shoulda-matchers"
 require "ans-matchers"
-require "delorean"
 
 describe EmailQueue do
   before do
