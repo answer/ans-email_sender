@@ -15,5 +15,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Ans::EmailSender::VERSION
 
+  gem.add_development_dependency "shoulda-matchers"
+  gem.add_development_dependency "ans-matchers"
+
   gem.add_runtime_dependency "ans-publishable", "~> 1.0", ">= 1.0.6"
 end
