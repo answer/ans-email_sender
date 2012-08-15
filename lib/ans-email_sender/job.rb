@@ -3,7 +3,7 @@
 module Ans::EmailSender
   module Job
     def self.included(m)
-      m.extend ClassMethods
+      m.send :extend, ClassMethods
     end
 
     module ClassMethods
