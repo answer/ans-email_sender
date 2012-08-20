@@ -16,7 +16,7 @@ module Ans::EmailSender
 
     def deliver(email_queue)
       validate! email_queue
-      mail(email_queue).deliver
+      email_queue.message_id = mail(email_queue).deliver.message_id
 
     rescue => e
       email_queue.send_error = "ERROR: #{e.message}"
