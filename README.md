@@ -46,6 +46,7 @@ EmailQueue は以下の属性を含む
 * `email_queue_publish_id` : `integer` : publishable で使用される ID
 * `sent_at` : `datetime` : 送信時刻
 * `send_error` : `string` : 送信エラー
+* `message_id` : `string` : 送信したメールの Message-ID
 
 SystemSetting は以下の属性を含む
 
