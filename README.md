@@ -27,6 +27,11 @@ Or install it yourself as:
     class EmailSender
       include Ans::EmailSender::Job
       @queue = :mail
+
+      def error(e,email_queue)
+        # 例外によりメールが送信できなかった場合にコールされる
+        # (ログの記録、エラー通知メールの送信、等)
+      end
     end
 
     # resque scheduler file
