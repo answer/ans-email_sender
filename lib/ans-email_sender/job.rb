@@ -20,6 +20,7 @@ module Ans::EmailSender
 
     rescue => e
       email_queue.send_error = "ERROR: #{e.message}"
+      error e, email_queue
     else
       email_queue.sent_at = Time.now
     ensure
@@ -36,6 +37,9 @@ module Ans::EmailSender
 
     def mail(email_queue)
       Ans::EmailSender::Mailer.queue(email_queue)
+    end
+
+    def error(e,email_queue)
     end
 
   end
